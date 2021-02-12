@@ -11,7 +11,16 @@ pipeline {
     stages {
         stage('Checkout'){
             steps{
-                checkout()
+                 checkout([$class: 'GitSCM',
+                    branches: [[name: '*/master']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanCheckout']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+//                         credentialsId: 'github-key',
+                        url: 'https://github.com/deepdivenow/k8s-services.git'
+                    ]]
+                ])
             }
         }
 
