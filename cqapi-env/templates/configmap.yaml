@@ -1,0 +1,11 @@
+{{- if len .Values.configs -}}
+{{- $fullName := include "cqapi-env.fullname" . -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}
+data:
+  {{- toYaml .Values.configs | nindent 2 }}
+
+
+{{- end }}

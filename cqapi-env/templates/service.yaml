@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cqapi-env.fullname" . }}
+  labels:
+    {{- include "cqapi-env.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- toYaml .Values.service.ports | nindent 12 }}
+
+  selector:
+    {{- include "cqapi-env.selectorLabels" . | nindent 4 }}
