@@ -3,6 +3,16 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
+initContainer:
+  enable: true
+  command:
+  - echo
+  - "Hello world"
+  image:
+    repository: busybox
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
 
 image:
   repository: nginx
@@ -91,3 +101,8 @@ affinity: {}
 
 configsPath: ""
 configs: []
+
+pvc:
+  enable: false
+  path: ""
+  size: 1GiB
