@@ -27,7 +27,7 @@ spec:
       serviceAccountName: {{ include "cqapi-env.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-{{- if .Values.initContainer.enable | default false}}
+      {{- if .Values.initContainer.enable | default false}}
       initContainers:
         - name: "init{{ .Release.Name }}"
           command:
@@ -40,19 +40,23 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
               {{- toYaml .Values.resources | nindent 12 }}
-{{- if or (.Values.configsPath) (.Values.pvc.enable) }}
+          {{- if or (.Values.configsPath) (.Values.pvc.enable) (.Values.emptyDir.enable) }}
           volumeMounts:
-{{- if .Values.pvc.enable }}
+          {{- if .Values.emptyDir.enable }}
+          - name: emptydir
+            mountPath: {{ .Values.emptyDir.path }}
+          {{- end }}
+          {{- if .Values.pvc.enable }}
           - name: persistent
             mountPath: {{ .Values.pvc.path }}
-{{- end }}
-{{- if .Values.configsPath }}
+          {{- end }}
+          {{- if .Values.configsPath }}
           - name: config
             mountPath: {{ .Values.configsPath }}
             readOnly: true
-{{- end }}
-{{- end }}
-{{- end }}
+          {{- end }}
+          {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Release.Name }}
           command:
@@ -71,31 +75,39 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-{{- if or (.Values.configsPath) (.Values.pvc.enable) }}
+          {{- if or (.Values.configsPath) (.Values.pvc.enable) (.Values.emptyDir.enable) }}
           volumeMounts:
-{{- if .Values.pvc.enable }}
+          {{- if .Values.emptyDir.enable }}
+            - name: emptydir
+              mountPath: {{ .Values.emptyDir.path }}
+          {{- end }}
+          {{- if .Values.pvc.enable }}
             - name: persistent
               mountPath: {{ .Values.pvc.path }}
-{{- end }}
-{{- if .Values.configsPath }}
+          {{- end }}
+          {{- if .Values.configsPath }}
             - name: config
               mountPath: {{ .Values.configsPath }}
               readOnly: true
-{{- end }}
-{{- end }}
-{{- if or (.Values.configsPath) (.Values.pvc.enable) }}
+          {{- end }}
+          {{- end }}
+      {{- if or (.Values.configsPath) (.Values.pvc.enable) (.Values.emptyDir.enable) }}
       volumes:
-{{- if .Values.pvc.enable }}
+        {{- if .Values.emptyDir.enable }}
+        - name: emptydir
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.pvc.enable }}
         - name: persistent
           persistentVolumeClaim:
             claimName: {{ include "cqapi-env.fullname" . }}
-{{- end }}
-{{- if len .Values.configs }}
+        {{- end }}
+        {{- if len .Values.configs }}
         - name: config
           configMap:
             name: {{ include "cqapi-env.fullname" . }}
-{{- end }}
-{{- end }}
+        {{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
