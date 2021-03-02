@@ -26,13 +26,13 @@ pipeline {
 
         stage('Build Helm chart') {
             steps {
-                ansiColor('xterm') { sh "helm package cqapi-env --version 0.1.${BUILD_NUMBER}" }
+                ansiColor('xterm') { sh "helm package k8s-services --version 0.1.${BUILD_NUMBER}" }
             }
         }
 
         stage('Push Helm chart') {
             steps {
-                ansiColor('xterm') { sh "helm push cqapi-env-0.1.${BUILD_NUMBER}.tgz carrotquest" }
+                ansiColor('xterm') { sh "helm push k8s-services-0.1.${BUILD_NUMBER}.tgz carrotquest" }
             }
         }
     } //stages

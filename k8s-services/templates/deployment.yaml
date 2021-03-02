@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cqapi-env.fullname" . }}
+  name: {{ include "k8s-services.fullname" . }}
   labels:
-    {{- include "cqapi-env.labels" . | nindent 4 }}
+    {{- include "k8s-services.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "cqapi-env.selectorLabels" . | nindent 6 }}
+      {{- include "k8s-services.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "cqapi-env.selectorLabels" . | nindent 8 }}
+        {{- include "k8s-services.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "cqapi-env.serviceAccountName" . }}
+      serviceAccountName: {{ include "k8s-services.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- if .Values.initContainer.enable | default false}}
@@ -40,7 +40,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
               {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or (.Values.configsPath) (.Values.pvc.enable) (.Values.emptyDir.enable) }}
+          {{- if or (.Values.configsPath) (.Values.pvc.enable) (.Values.emptyDir.enable)}}
           volumeMounts:
           {{- if .Values.emptyDir.enable }}
           - name: emptydir
@@ -100,12 +100,12 @@ spec:
         {{- if .Values.pvc.enable }}
         - name: persistent
           persistentVolumeClaim:
-            claimName: {{ include "cqapi-env.fullname" . }}
+            claimName: {{ include "k8s-services.fullname" . }}
         {{- end }}
         {{- if len .Values.configs }}
         - name: config
           configMap:
-            name: {{ include "cqapi-env.fullname" . }}
+            name: {{ include "k8s-services.fullname" . }}
         {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
