@@ -32,7 +32,7 @@ pipeline {
 
         stage('Push Helm chart') {
             steps {
-                ansiColor('xterm') { sh "helm push k8s-services-0.1.${BUILD_NUMBER}.tgz carrotquest" }
+                ansiColor('xterm') { sh "helm cm-push k8s-services-0.1.${BUILD_NUMBER}.tgz carrotquest" }
             }
         }
     } //stages
